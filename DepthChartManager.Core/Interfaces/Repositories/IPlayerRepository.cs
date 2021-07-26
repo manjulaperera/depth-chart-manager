@@ -5,7 +5,7 @@ namespace DepthChartManager.Core.Interfaces.Repositories
 {
     public interface IPlayerRepository
     {
-        Player AddPlayer(string name);
+        void AddPlayer(string name);
 
         IEnumerable<Player> GetPlayers();
     }

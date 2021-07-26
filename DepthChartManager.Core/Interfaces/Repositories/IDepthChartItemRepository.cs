@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DepthChartManager.Core.Interfaces.Repositories
 {
-    public interface ILeagueRepository
+    public interface IDepthChartItemRepository
     {
         League AddLeague(string name);
 

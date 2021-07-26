@@ -2,26 +2,32 @@
 using DepthChartManager.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DepthChartManager.Infrastructure.Repositories
 {
     public class PlayerRepository : IPlayerRepository
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private Dictionary<int, string> _playersMap = new Dictionary<int, string>();
 
-        public PlayerRepository(IUnitOfWork unitOfWork)
+        public void AddPlayer(string name)
         {
-            _unitOfWork = unitOfWork;
-        }
+            if (!string.IsNullOrWhiteSpace(name) && !_playersMap.Values.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                var id = _playersMap.Count + 1;
+                _playersMap[id] = name;
+            }
 
-        public Player AddPlayer(string name)
-        {
-            throw new NotImplementedException();
+            throw new Exception();
         }
 
         public IEnumerable<Player> GetPlayers()
         {
-            throw new NotImplementedException();
+            return _playersMap.Select(kvp => new Player
+            {
+                Id = kvp.Key,
+                Name = kvp.Value
+            });
         }
     }
 }

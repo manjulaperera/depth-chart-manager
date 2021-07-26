@@ -5,12 +5,12 @@ namespace DepthChartManager.Core.Interfaces.Repositories
 {
     public interface ISportRepository
     {
-        Sport AddSport(string name);
+        void AddSport(string name);
 
         IEnumerable<Sport> GetSports();
 
-        SportPosition AddSportPosition(Sport sport, string name);
+        void AddSportPosition(int sportId, string name);
 
-        IEnumerable<SportPosition> GetSportPositons(Sport sport);
+        IEnumerable<SportPosition> GetSportPositons(int sportId);
     }
 }

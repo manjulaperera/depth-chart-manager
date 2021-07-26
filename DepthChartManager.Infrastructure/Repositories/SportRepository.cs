@@ -2,36 +2,59 @@
 using DepthChartManager.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DepthChartManager.Infrastructure.Repositories
 {
     public class SportRepository : ISportRepository
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private Dictionary<int, string> _sportsMap = new Dictionary<int, string>();
+        private Dictionary<int, List<string>> _sportPositionMap = new Dictionary<int, List<string>>();
 
-        public SportRepository(IUnitOfWork unitOfWork)
+        public void AddSport(string name)
         {
-            _unitOfWork = unitOfWork;
+            if (!string.IsNullOrWhiteSpace(name) && !_sportsMap.Values.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                var id = _sportsMap.Count + 1;
+                _sportsMap[id] = name;
+                _sportPositionMap[id] = new List<string>();
+            }
+
+            throw new Exception();
         }
 
-        public Sport AddSport(string name)
+        public void AddSportPosition(int sportId, string name)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrWhiteSpace(name) && _sportsMap.ContainsKey(sportId) && !_sportPositionMap[sportId].Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                _sportPositionMap[sportId].Add(name);
+            }
+
+            throw new Exception();
         }
 
-        public SportPosition AddSportPosition(Sport sport, string name)
+        public IEnumerable<SportPosition> GetSportPositons(int sportId)
         {
-            throw new NotImplementedException();
-        }
+            if (_sportsMap.ContainsKey(sportId))
+            {
+                return _sportPositionMap[sportId].Select((item, index) => new SportPosition
+                {
+                    Id = index,
+                    Name = item,
+                    SportId = sportId
+                });
+            }
 
-        public IEnumerable<SportPosition> GetSportPositons(Sport sport)
-        {
-            throw new NotImplementedException();
+            return Enumerable.Empty<SportPosition>();
         }
 
         public IEnumerable<Sport> GetSports()
         {
-            throw new NotImplementedException();
+            return _sportsMap.Select(kvp => new Sport
+            {
+                Id = kvp.Key,
+                Name = kvp.Value
+            });
         }
     }
 }

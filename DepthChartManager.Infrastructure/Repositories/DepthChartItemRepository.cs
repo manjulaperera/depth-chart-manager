@@ -5,16 +5,9 @@ using System.Collections.Generic;
 
 namespace DepthChartManager.Infrastructure.Repositories
 {
-    public class LeagueRepository : ILeagueRepository
+    public class DepthChartItemRepository : IDepthChartItemRepository
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public LeagueRepository(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
-        public DepthChartItem AddDepthChartItem(TeamPlayer teamPlayer, SportPosition sportPosition)
+        public DepthChartItem AddDepthChartItem(int playerId, int sportPositionId, int depth)
         {
             throw new NotImplementedException();
         }

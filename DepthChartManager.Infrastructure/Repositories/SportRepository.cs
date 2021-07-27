@@ -76,9 +76,9 @@ namespace DepthChartManager.Infrastructure.Repositories
             return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.Players;
         }
 
-        public Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, Guid playerId)
+        public Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, string playerName)
         {
-            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.GetPlayer(playerId);
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.GetPlayer(playerName);
         }
 
         public IEnumerable<PlayerPosition> GetPositionOfPlayers(Guid sportId, Guid leagueId, Guid teamId)

@@ -1,14 +1,14 @@
-﻿using DepthChartManager.Core.Dtos;
+﻿using AutoMapper;
+using DepthChartManager.Core.Dtos;
 using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
-using Nelibur.ObjectMapper;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DepthChartManager.Core.Messaging
 {
-    public class AddSportCommand : IRequest<SportDto>
+    public class AddSportCommand : IRequest<CommandResult<SportDto>>
     {
         public AddSportCommand(CreateSportDto createSportDto)
         {
@@ -18,25 +18,27 @@ namespace DepthChartManager.Core.Messaging
         public CreateSportDto CreateSportDto { get; }
     }
 
-    public class AddSportCommandHandler : IRequestHandler<AddSportCommand, SportDto>
+    public class AddSportCommandHandler : IRequestHandler<AddSportCommand, CommandResult<SportDto>>
     {
+        private readonly IMapper _mapper;
         private readonly ISportRepository _sportRepository;
 
-        public AddSportCommandHandler(ISportRepository sportRepository)
+        public AddSportCommandHandler(IMapper mapper, ISportRepository sportRepository)
         {
+            _mapper = mapper;
             _sportRepository = sportRepository;
         }
 
-        public Task<SportDto> Handle(AddSportCommand request, CancellationToken cancellationToken)
+        public Task<CommandResult<SportDto>> Handle(AddSportCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var sport = _sportRepository.AddSport(request.CreateSportDto.Name);
-                return Task.FromResult(TinyMapper.Map<SportDto>(sport));
+                return Task.FromResult(new CommandResult<SportDto>(_mapper.Map<SportDto>(sport)));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(default(SportDto));
+                return Task.FromResult(new CommandResult<SportDto>(ex.Message));
             }
         }
     }

@@ -7,6 +7,6 @@ namespace DepthChartManager.Core.Dtos
         public Guid SportId { get; set; }
         public Guid LeagueId { get; set; }
         public Guid TeamId { get; set; }
-        public Guid PlayerId { get; set; }
+        public string PlayerName { get; set; }
     }
 }

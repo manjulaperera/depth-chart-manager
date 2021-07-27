@@ -20,20 +20,20 @@ namespace DepthChartManager.Domain
         }
 
         public Guid Id { get; }
-        
+
         public Guid SportId { get; }
-        
+
         public Guid LeagueId { get; }
-        
+
         public string Name { get; }
-        
+
         public IEnumerable<Player> Players => _players.AsReadOnly();
 
         public IEnumerable<PlayerPosition> PlayerPositions
         {
             get
             {
-                var supportingPositionGroups = _playerPositions.GroupBy(r => new { r.SupportingPositionId, r.SupportingPositionRanking });
+                var supportingPositionGroups = _playerPositions.Where(p => p.SupportingPositionRanking >= 0).GroupBy(r => new { r.SupportingPositionId, r.SupportingPositionRanking });
 
                 foreach (var supportingPositionGroup in supportingPositionGroups)
                 {
@@ -55,9 +55,9 @@ namespace DepthChartManager.Domain
             return player;
         }
 
-        public Player GetPlayer(Guid playerId)
+        public Player GetPlayer(string name)
         {
-            return _players.Find(p => p.Id == playerId);
+            return _players.Find(p => string.Equals(name, p.Name, StringComparison.OrdinalIgnoreCase));
         }
 
         public IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid playerId)

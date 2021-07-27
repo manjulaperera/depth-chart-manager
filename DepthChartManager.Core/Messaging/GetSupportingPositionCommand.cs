@@ -1,7 +1,7 @@
-﻿using DepthChartManager.Core.Dtos;
+﻿using AutoMapper;
+using DepthChartManager.Core.Dtos;
 using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
-using Nelibur.ObjectMapper;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,10 +20,12 @@ namespace DepthChartManager.Core.Messaging
 
     public class GetSupportingPositionCommandHandler : IRequestHandler<GetSupportingPositionCommand, SupportingPositionDto>
     {
+        private readonly IMapper _mapper;
         private readonly ISportRepository _sportRepository;
 
-        public GetSupportingPositionCommandHandler(ISportRepository sportRepository)
+        public GetSupportingPositionCommandHandler(IMapper mapper, ISportRepository sportRepository)
         {
+            _mapper = mapper;
             _sportRepository = sportRepository;
         }
 
@@ -32,7 +34,7 @@ namespace DepthChartManager.Core.Messaging
             try
             {
                 var supportingPosition = _sportRepository.GetSupportingPosition(request.SupportingPositionDto.SportId, request.SupportingPositionDto.SupportingPositionName);
-                return Task.FromResult(TinyMapper.Map<SupportingPositionDto>(supportingPosition));
+                return Task.FromResult(_mapper.Map<SupportingPositionDto>(supportingPosition));
             }
             catch (Exception ex)
             {

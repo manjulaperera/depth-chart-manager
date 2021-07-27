@@ -30,7 +30,7 @@ namespace DepthChartManager.Core.Interfaces.Repositories
 
         IEnumerable<Player> GetPlayers(Guid sportId, Guid leagueId, Guid teamId);
 
-        Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, Guid playerId);
+        Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, string playerName);
 
         IEnumerable<PlayerPosition> GetPositionOfPlayers(Guid sportId, Guid leagueId, Guid teamId);
 

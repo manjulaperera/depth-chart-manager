@@ -1,7 +1,7 @@
-﻿using DepthChartManager.Core.Dtos;
+﻿using AutoMapper;
+using DepthChartManager.Core.Dtos;
 using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
-using Nelibur.ObjectMapper;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,10 +20,12 @@ namespace DepthChartManager.Core.Messaging
 
     public class AddPlayerCommandHandler : IRequestHandler<AddPlayerCommand, PlayerDto>
     {
+        private readonly IMapper _mapper;
         public readonly ISportRepository _sportRepository;
 
-        public AddPlayerCommandHandler(ISportRepository sportRepository)
+        public AddPlayerCommandHandler(IMapper mapper, ISportRepository sportRepository)
         {
+            _mapper = mapper;
             _sportRepository = sportRepository;
         }
 
@@ -32,7 +34,7 @@ namespace DepthChartManager.Core.Messaging
             try
             {
                 var player = _sportRepository.AddPlayer(request.AddPlayerDto.SportId, request.AddPlayerDto.LeagueId, request.AddPlayerDto.TeamId, request.AddPlayerDto.Name);
-                return Task.FromResult(TinyMapper.Map<PlayerDto>(player));
+                return Task.FromResult(_mapper.Map<PlayerDto>(player));
             }
             catch (Exception ex)
             {

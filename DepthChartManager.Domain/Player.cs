@@ -15,7 +15,7 @@ namespace DepthChartManager.Domain
             Name = name;
         }
 
-        public Guid Id { get;  }
+        public Guid Id { get; }
         public Guid SportId { get; }
         public Guid LeagueId { get; }
         public Guid TeamId { get; }

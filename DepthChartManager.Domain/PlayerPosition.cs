@@ -1,22 +1,28 @@
-﻿using System;
+﻿using DepthChartManager.Helpers;
+using System;
 
 namespace DepthChartManager.Domain
 {
     public class PlayerPosition
     {
-        public PlayerPosition(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
+        public PlayerPosition(League league, Team team, Player player, SupportingPosition supportingPosition, int supportingPositionRanking)
         {
-            LeagueId = leagueId;
-            TeamId = teamId;
-            PlayerId = playerId;
-            SupportingPositionId = supportingPositionId;
+            Contract.Requires<Exception>(league != null, Resource.LeagueNameIsInvalid);
+            Contract.Requires<Exception>(team != null, Resource.TeamNameIsInvalid);
+            Contract.Requires<Exception>(league != null, Resource.PlayerNameIsInvalid);
+            Contract.Requires<Exception>(team != null, Resource.SupportPositionNameIsInvalid);
+
+            League = league;
+            Team = team;
+            Player = player;
+            SupportingPosition = supportingPosition;
             SupportingPositionRanking = supportingPositionRanking;
         }
 
-        public Guid LeagueId { get; }
-        public Guid TeamId { get; }
-        public Guid PlayerId { get; }
-        public Guid SupportingPositionId { get; }
+        public League League { get; }
+        public Team Team { get; }
+        public Player Player { get; }
+        public SupportingPosition SupportingPosition { get; }
         public int SupportingPositionRanking { get; }
     }
 }

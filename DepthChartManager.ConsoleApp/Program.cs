@@ -17,6 +17,12 @@ namespace DepthChartManager.ConsoleApp
 
         private static void Main(string[] args)
         {
+            Stack<int> l = new Stack<int>();
+            l.Push(1);
+            l.Push(2);
+            l.Push(3);
+
+            
             Task.Run(async () => await new Program().ConfigureServices().Run()).Wait();
         }
 
@@ -51,18 +57,20 @@ namespace DepthChartManager.ConsoleApp
             await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, wr.Id, 0);
             await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, alice.Id, wr.Id, 0);
             await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, charlie.Id, wr.Id, 2);
-            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
+            //await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
 
             var playerPositions = await GetPlayerPositions(nfl.Id, buffaloBills.Id);
 
-            foreach (var supportingPositionInfo in playerPositions.GroupBy(p => p.SupportingPositionId))
+            foreach (var supportingPositionInfo in playerPositions.GroupBy(p => p.SupportingPosition.Name))
             {
-                Console.WriteLine(supportingPositionInfo.Key);
+                Console.WriteLine($"{supportingPositionInfo.Key}: [{string.Join(",", supportingPositionInfo.Select(s => s.Player.Name))}]");
+            }
 
-                foreach (var playerPositionInfo in supportingPositionInfo)
-                {
-                    Console.WriteLine($"{playerPositionInfo.PlayerId} ({playerPositionInfo.SupportingPositionRanking})");
-                }
+            var backupPlayerPositions = await GetBackupPlayerPositions(nfl.Id, buffaloBills.Id, alice.Id);
+
+            foreach (var backPlayerPosition in backupPlayerPositions)
+            {
+                //Console.WriteLine($"{backPlayerPosition.Player.Name}");
             }
         }
 
@@ -164,6 +172,20 @@ namespace DepthChartManager.ConsoleApp
             {
                 LeagueId = leagueId,
                 TeamId = teamId,
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<IEnumerable<PlayerPositionDto>> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new GetBackupPlayersCommand(new GetBackupPlayersDto
+            {
+                LeagueId = leagueId,
+                TeamId = teamId,
+                PlayerId = playerId
             }));
 
             return result.Result;

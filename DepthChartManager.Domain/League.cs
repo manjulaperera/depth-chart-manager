@@ -13,6 +13,7 @@ namespace DepthChartManager.Domain
         public League(string name)
         {
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.LeagueNameIsInvalid);
+
             Id = Guid.NewGuid();
             Name = name;
         }
@@ -35,7 +36,7 @@ namespace DepthChartManager.Domain
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.TeamNameIsInvalid);
             Contract.Requires<Exception>(!_teams.Exists(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)), Resource.TeamAlreadyExists);
 
-            var team = new Team(Id, name);
+            var team = new Team(this, name);
             _teams.Add(team);
             return team;
         }

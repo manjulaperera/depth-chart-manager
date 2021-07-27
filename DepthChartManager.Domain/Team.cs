@@ -10,18 +10,19 @@ namespace DepthChartManager.Domain
         private List<Player> _players = new List<Player>();
         private List<PlayerPosition> _playerPositions = new List<PlayerPosition>();
 
-        public Team(Guid leagueId, string name)
+        public Team(League league, string name)
         {
+            Contract.Requires<Exception>(league != null, Resource.LeagueNameIsInvalid);
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.TeamNameIsInvalid);
             Id = Guid.NewGuid();
-            LeagueId = leagueId;
+            League = league;
             Name = name;
         }
 
         public Guid Id { get; }
 
-        public Guid LeagueId { get; }
-
+        public League Leagued { get; }
+        public League League { get; }
         public string Name { get; }
 
         public IEnumerable<Player> Players => _players.AsReadOnly();
@@ -30,7 +31,7 @@ namespace DepthChartManager.Domain
         {
             get
             {
-                var supportingPositionGroups = _playerPositions.Where(p => p.SupportingPositionRanking >= 0).GroupBy(r => new { r.SupportingPositionId, r.SupportingPositionRanking });
+                var supportingPositionGroups = _playerPositions.Where(p => p.SupportingPositionRanking >= 0).GroupBy(r => new { r.SupportingPosition.Id, r.SupportingPositionRanking });
 
                 foreach (var supportingPositionGroup in supportingPositionGroups)
                 {
@@ -47,7 +48,7 @@ namespace DepthChartManager.Domain
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.PlayerNameIsInvalid);
             Contract.Requires<Exception>(!_players.Exists(player => string.Equals(player.Name, name, StringComparison.OrdinalIgnoreCase)), Resource.PlayerAlreadyExistsWithinTeam);
 
-            var player = new Player(LeagueId, Id, name);
+            var player = new Player(League, this, name);
             _players.Add(player);
             return player;
         }
@@ -59,15 +60,18 @@ namespace DepthChartManager.Domain
 
         public IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid playerId)
         {
-            var playerPosition = _playerPositions.Find(pp => pp.PlayerId == playerId);
+            var playerPosition = _playerPositions.Find(pp => pp.Player.Id == playerId);
             return _playerPositions.Where(pp => pp.SupportingPositionRanking > playerPosition?.SupportingPositionRanking);
         }
 
         public PlayerPosition UpdatePlayerPosition(Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
         {
-            //_playerPositions.RemoveAll(pp => pp.PlayerId == playerId);
+            _playerPositions.RemoveAll(pp => pp.Player.Id == playerId);
 
-            var playerPosition = new PlayerPosition(LeagueId, Id, playerId, supportingPositionId, supportingPositionRanking);
+            var player = _players.Find(p => p.Id == playerId);
+            var supportingPosition = League.SupportingPositions.FirstOrDefault(s => s.Id == supportingPositionId);
+
+            var playerPosition = new PlayerPosition(League, this, player, supportingPosition, supportingPositionRanking);
             _playerPositions.Add(playerPosition);
             return playerPosition;
         }

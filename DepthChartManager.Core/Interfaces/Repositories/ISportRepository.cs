@@ -1,16 +1,39 @@
 ﻿using DepthChartManager.Domain;
+using System;
 using System.Collections.Generic;
 
 namespace DepthChartManager.Core.Interfaces.Repositories
 {
     public interface ISportRepository
     {
-        void AddSport(string name);
+        Sport AddSport(string name);
+
+        Sport GetSport(Guid id);
 
         IEnumerable<Sport> GetSports();
 
-        void AddSportPosition(int sportId, string name);
+        League AddLeague(Guid sportId, string name);
 
-        IEnumerable<SportPosition> GetSportPositons(int sportId);
+        IEnumerable<League> GetLeagues(Guid sportId);
+
+        SupportingPosition AddSupportingPosition(Guid sportId, string name);
+
+        IEnumerable<SupportingPosition> GetSupportingPositions(Guid sportId);
+
+        Team AddTeam(Guid sportId, Guid leagueId, string teamName);
+
+        IEnumerable<Team> GetTeams(Guid sportId, Guid leagueId);
+
+        Player AddPlayer(Guid sportId, Guid leagueId, Guid teamId, string name);
+
+        IEnumerable<Player> GetPlayers(Guid sportId, Guid leagueId, Guid teamId);
+
+        Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, Guid playerId);
+
+        IEnumerable<PlayerPosition> GetPositionOfPlayers(Guid sportId, Guid leagueId, Guid teamId);
+
+        PlayerPosition UpdatePlayerPosition(Guid sportId, Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking);
+
+        IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid sportId, Guid leagueId, Guid teamId, Guid playerId);
     }
 }

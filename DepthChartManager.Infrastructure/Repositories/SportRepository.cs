@@ -1,60 +1,93 @@
 ﻿using DepthChartManager.Core.Interfaces.Repositories;
 using DepthChartManager.Domain;
+using DepthChartManager.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DepthChartManager.Infrastructure.Repositories
 {
     public class SportRepository : ISportRepository
     {
-        private Dictionary<int, string> _sportsMap = new Dictionary<int, string>();
-        private Dictionary<int, List<string>> _sportPositionMap = new Dictionary<int, List<string>>();
+        private List<Sport> _sports = new List<Sport>();
 
-        public void AddSport(string name)
+        public Sport AddSport(string name)
         {
-            if (!string.IsNullOrWhiteSpace(name) && !_sportsMap.Values.Contains(name, StringComparer.OrdinalIgnoreCase))
-            {
-                var id = _sportsMap.Count + 1;
-                _sportsMap[id] = name;
-                _sportPositionMap[id] = new List<string>();
-            }
+            Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.SportNameIsInvalid);
+            Contract.Requires<Exception>(!_sports.Exists(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase)), Resource.SportsAlreadyExists);
 
-            throw new Exception();
+            var sport = new Sport(name);
+            _sports.Add(sport);
+            return sport;
         }
 
-        public void AddSportPosition(int sportId, string name)
+        public Sport GetSport(Guid sportId)
         {
-            if (!string.IsNullOrWhiteSpace(name) && _sportsMap.ContainsKey(sportId) && !_sportPositionMap[sportId].Contains(name, StringComparer.OrdinalIgnoreCase))
-            {
-                _sportPositionMap[sportId].Add(name);
-            }
-
-            throw new Exception();
-        }
-
-        public IEnumerable<SportPosition> GetSportPositons(int sportId)
-        {
-            if (_sportsMap.ContainsKey(sportId))
-            {
-                return _sportPositionMap[sportId].Select((item, index) => new SportPosition
-                {
-                    Id = index,
-                    Name = item,
-                    SportId = sportId
-                });
-            }
-
-            return Enumerable.Empty<SportPosition>();
+            return _sports.Find(s => s.Id == sportId);
         }
 
         public IEnumerable<Sport> GetSports()
         {
-            return _sportsMap.Select(kvp => new Sport
-            {
-                Id = kvp.Key,
-                Name = kvp.Value
-            });
+            return _sports.AsReadOnly();
+        }
+
+        public League AddLeague(Guid sportId, string name)
+        {
+            return GetSport(sportId)?.AddLeague(name);
+        }
+
+        public IEnumerable<League> GetLeagues(Guid sportId)
+        {
+            return GetSport(sportId)?.Leagues;
+        }
+
+        public SupportingPosition AddSupportingPosition(Guid sportId, string name)
+        {
+            return GetSport(sportId)?.AddSupportingPosition(name);
+        }
+
+        public IEnumerable<SupportingPosition> GetSupportingPositions(Guid sportId)
+        {
+            return GetSport(sportId)?.SupportingPositions;
+        }
+
+        public Team AddTeam(Guid sportId, Guid leagueId, string teamName)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.AddTeam(teamName);
+        }
+
+        public IEnumerable<Team> GetTeams(Guid sportId, Guid leagueId)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.Teams;
+        }
+
+        public Player AddPlayer(Guid sportId, Guid leagueId, Guid teamId, string name)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.AddPlayer(name);
+        }
+
+        public IEnumerable<Player> GetPlayers(Guid sportId, Guid leagueId, Guid teamId)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.Players;
+        }
+
+        public Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, Guid playerId)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.GetPlayer(playerId);
+        }
+
+        public IEnumerable<PlayerPosition> GetPositionOfPlayers(Guid sportId, Guid leagueId, Guid teamId)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.PlayerPositions;
+        }
+
+        public PlayerPosition UpdatePlayerPosition(Guid sportId, Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.UpdatePlayerPosition(playerId, supportingPositionId, supportingPositionRanking);
+        }
+
+        public IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid sportId, Guid leagueId, Guid teamId, Guid playerId)
+        {
+            return GetSport(sportId)?.GetLeague(leagueId)?.GetTeam(teamId)?.GetBackupPlayerPositions(playerId);
         }
     }
 }

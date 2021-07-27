@@ -5,4 +5,13 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MediatR.SimpleInjector" Version="8.0.2.2" />
+    <PackageReference Include="SimpleInjector" Version="5.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DepthChartManager.Infrastructure\DepthChartManager.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,26 +1,44 @@
 ﻿using DepthChartManager.Core.Dtos;
+using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
+using Nelibur.ObjectMapper;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DepthChartManager.Core.Messaging
 {
-    public class UpdatePlayerPositionCommand : IRequest
+    public class UpdatePlayerPositionCommand : IRequest<PlayerPositionDto>
     {
-        public UpdatePlayerPositionCommand(UpdatePlayerPosition updatePlayerPosition)
+        public UpdatePlayerPositionCommand(UpdatePlayerPositionDto updatePlayerPosition)
         {
-            UpdatePlayerPosition = updatePlayerPosition;
+            UpdatePlayerPositionDto = updatePlayerPosition;
         }
 
-        public UpdatePlayerPosition UpdatePlayerPosition { get; }
+        public UpdatePlayerPositionDto UpdatePlayerPositionDto { get; }
     }
 
-    public class UpdatePlayerPositionCommandHandler : IRequestHandler<UpdatePlayerPositionCommand>
+    public class UpdatePlayerPositionCommandHandler : IRequestHandler<UpdatePlayerPositionCommand, PlayerPositionDto>
     {
-        public Task<Unit> Handle(UpdatePlayerPositionCommand request, CancellationToken cancellationToken)
+        private readonly ISportRepository _sportRepository;
+
+        public UpdatePlayerPositionCommandHandler(ISportRepository sportRepository)
         {
-            throw new NotImplementedException();
+            _sportRepository = sportRepository;
+        }
+
+
+        public Task<PlayerPositionDto> Handle(UpdatePlayerPositionCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var sport = _sportRepository.UpdatePlayerPosition(request.UpdatePlayerPositionDto.SportId, request.UpdatePlayerPositionDto.LeagueId, request.UpdatePlayerPositionDto.TeamId, request.UpdatePlayerPositionDto.PlayerId, request.UpdatePlayerPositionDto.SupportingPositionId, request.UpdatePlayerPositionDto.SupportingPositionRanking);
+                return Task.FromResult(TinyMapper.Map<PlayerPositionDto>(sport));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(default(PlayerPositionDto));
+            }
         }
     }
 }

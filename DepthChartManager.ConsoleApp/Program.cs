@@ -6,18 +6,11 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DepthChartManager.ConsoleApp
 {
-    internal class User
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Position { get; set; }
-        public int Ranking { get; set; }
-    }
-
     public class Program
     {
         private IServiceProvider _serviceProvider;
@@ -61,6 +54,16 @@ namespace DepthChartManager.ConsoleApp
             await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
 
             var playerPositions = await GetPlayerPositions(nfl.Id, buffaloBills.Id);
+
+            foreach (var supportingPositionInfo in playerPositions.GroupBy(p => p.SupportingPositionId))
+            {
+                Console.WriteLine(supportingPositionInfo.Key);
+
+                foreach (var playerPositionInfo in supportingPositionInfo)
+                {
+                    Console.WriteLine($"{playerPositionInfo.PlayerId} ({playerPositionInfo.SupportingPositionRanking})");
+                }
+            }
         }
 
         private Program ConfigureServices()

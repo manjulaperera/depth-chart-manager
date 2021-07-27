@@ -8,7 +8,6 @@ namespace DepthChartManager.Core
     {
         public SportMappingProfile()
         {
-            CreateMap<Sport, SportDto>();
             CreateMap<League, LeagueDto>();
             CreateMap<Player, PlayerDto>();
             CreateMap<Team, TeamDto>();

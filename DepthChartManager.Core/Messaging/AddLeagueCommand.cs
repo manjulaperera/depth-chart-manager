@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DepthChartManager.Core.Messaging
 {
-    public class AddLeagueCommand : IRequest<LeagueDto>
+    public class AddLeagueCommand : IRequest<CommandResult<LeagueDto>>
     {
         public AddLeagueCommand(CreateLeagueDto createLeagueDto)
         {
@@ -18,7 +18,7 @@ namespace DepthChartManager.Core.Messaging
         public CreateLeagueDto CreateLeagueDto { get; }
     }
 
-    public class AddLeagueCommandHandler : IRequestHandler<AddLeagueCommand, LeagueDto>
+    public class AddLeagueCommandHandler : IRequestHandler<AddLeagueCommand, CommandResult<LeagueDto>>
     {
         private readonly IMapper _mapper;
         private readonly ISportRepository _sportRepository;
@@ -29,16 +29,16 @@ namespace DepthChartManager.Core.Messaging
             _sportRepository = sportRepository;
         }
 
-        public Task<LeagueDto> Handle(AddLeagueCommand request, CancellationToken cancellationToken)
+        public Task<CommandResult<LeagueDto>> Handle(AddLeagueCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var league = _sportRepository.AddLeague(request.CreateLeagueDto.SportId, request.CreateLeagueDto.Name);
-                return Task.FromResult(_mapper.Map<LeagueDto>(league));
+                var league = _sportRepository.AddLeague(request.CreateLeagueDto.Name);
+                return Task.FromResult(new CommandResult<LeagueDto>(_mapper.Map<LeagueDto>(league)));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(default(LeagueDto));
+                return Task.FromResult(new CommandResult<LeagueDto>(ex.Message));
             }
         }
     }

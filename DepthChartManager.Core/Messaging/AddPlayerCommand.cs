@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DepthChartManager.Core.Messaging
 {
-    public class AddPlayerCommand : IRequest<PlayerDto>
+    public class AddPlayerCommand : IRequest<CommandResult<PlayerDto>>
     {
         public AddPlayerCommand(CreatePlayerDto createPlayerDto)
         {
@@ -18,7 +18,7 @@ namespace DepthChartManager.Core.Messaging
         public CreatePlayerDto AddPlayerDto { get; }
     }
 
-    public class AddPlayerCommandHandler : IRequestHandler<AddPlayerCommand, PlayerDto>
+    public class AddPlayerCommandHandler : IRequestHandler<AddPlayerCommand, CommandResult<PlayerDto>>
     {
         private readonly IMapper _mapper;
         public readonly ISportRepository _sportRepository;
@@ -29,16 +29,16 @@ namespace DepthChartManager.Core.Messaging
             _sportRepository = sportRepository;
         }
 
-        public Task<PlayerDto> Handle(AddPlayerCommand request, CancellationToken cancellationToken)
+        public Task<CommandResult<PlayerDto>> Handle(AddPlayerCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var player = _sportRepository.AddPlayer(request.AddPlayerDto.SportId, request.AddPlayerDto.LeagueId, request.AddPlayerDto.TeamId, request.AddPlayerDto.Name);
-                return Task.FromResult(_mapper.Map<PlayerDto>(player));
+                var player = _sportRepository.AddPlayer(request.AddPlayerDto.LeagueId, request.AddPlayerDto.TeamId, request.AddPlayerDto.Name);
+                return Task.FromResult(new CommandResult<PlayerDto>(_mapper.Map<PlayerDto>(player)));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(default(PlayerDto));
+                return Task.FromResult(new CommandResult<PlayerDto>(ex.Message));
             }
         }
     }

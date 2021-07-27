@@ -10,18 +10,15 @@ namespace DepthChartManager.Domain
         private List<Player> _players = new List<Player>();
         private List<PlayerPosition> _playerPositions = new List<PlayerPosition>();
 
-        public Team(Guid sportId, Guid leagueId, string name)
+        public Team(Guid leagueId, string name)
         {
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.TeamNameIsInvalid);
             Id = Guid.NewGuid();
-            SportId = sportId;
             LeagueId = leagueId;
             Name = name;
         }
 
         public Guid Id { get; }
-
-        public Guid SportId { get; }
 
         public Guid LeagueId { get; }
 
@@ -50,7 +47,7 @@ namespace DepthChartManager.Domain
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.PlayerNameIsInvalid);
             Contract.Requires<Exception>(!_players.Exists(player => string.Equals(player.Name, name, StringComparison.OrdinalIgnoreCase)), Resource.PlayerAlreadyExistsWithinTeam);
 
-            var player = new Player(SportId, LeagueId, Id, name);
+            var player = new Player(LeagueId, Id, name);
             _players.Add(player);
             return player;
         }
@@ -68,9 +65,9 @@ namespace DepthChartManager.Domain
 
         public PlayerPosition UpdatePlayerPosition(Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
         {
-            _playerPositions.RemoveAll(pp => pp.PlayerId == playerId);
+            //_playerPositions.RemoveAll(pp => pp.PlayerId == playerId);
 
-            var playerPosition = new PlayerPosition(SportId, LeagueId, Id, playerId, supportingPositionId, supportingPositionRanking);
+            var playerPosition = new PlayerPosition(LeagueId, Id, playerId, supportingPositionId, supportingPositionRanking);
             _playerPositions.Add(playerPosition);
             return playerPosition;
         }

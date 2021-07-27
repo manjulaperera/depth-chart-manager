@@ -61,20 +61,20 @@ namespace DepthChartManager.Infrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid sport name.
+        ///   Looks up a localized string similar to League with the same name already exists.
         /// </summary>
-        internal static string SportNameIsInvalid {
+        internal static string LeagueAlreadyExists {
             get {
-                return ResourceManager.GetString("SportNameIsInvalid", resourceCulture);
+                return ResourceManager.GetString("LeagueAlreadyExists", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sport with the same name already exists.
+        ///   Looks up a localized string similar to Invalid league name.
         /// </summary>
-        internal static string SportsAlreadyExists {
+        internal static string LeagueNameIsInvalid {
             get {
-                return ResourceManager.GetString("SportsAlreadyExists", resourceCulture);
+                return ResourceManager.GetString("LeagueNameIsInvalid", resourceCulture);
             }
         }
     }

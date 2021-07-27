@@ -132,9 +132,6 @@
   <data name="PlayerPositionIsInvalid" xml:space="preserve">
     <value>Invalid player position</value>
   </data>
-  <data name="SportNameIsInvalid" xml:space="preserve">
-    <value>Invalid sport name</value>
-  </data>
   <data name="SupportPositionAlreadyExists" xml:space="preserve">
     <value>Support position with the same name already exists for this sport</value>
   </data>

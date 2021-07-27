@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SportNameIsInvalid" xml:space="preserve">
-    <value>Invalid sport name</value>
+  <data name="LeagueAlreadyExists" xml:space="preserve">
+    <value>League with the same name already exists</value>
   </data>
-  <data name="SportsAlreadyExists" xml:space="preserve">
-    <value>Sport with the same name already exists</value>
+  <data name="LeagueNameIsInvalid" xml:space="preserve">
+    <value>Invalid league name</value>
   </data>
 </root>

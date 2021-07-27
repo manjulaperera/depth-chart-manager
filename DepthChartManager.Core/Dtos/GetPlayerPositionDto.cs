@@ -2,10 +2,9 @@
 
 namespace DepthChartManager.Core.Dtos
 {
-    public class GetPlayerDto
+    public class GetPlayerPositionDto
     {
         public Guid LeagueId { get; set; }
         public Guid TeamId { get; set; }
-        public string PlayerName { get; set; }
     }
 }

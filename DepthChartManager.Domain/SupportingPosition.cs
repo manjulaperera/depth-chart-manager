@@ -5,16 +5,16 @@ namespace DepthChartManager.Domain
 {
     public class SupportingPosition
     {
-        public SupportingPosition(Guid sportId, string name)
+        public SupportingPosition(Guid leagueId, string name)
         {
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.SupportPositionNameIsInvalid);
             Id = Guid.NewGuid();
-            SportId = sportId;
+            LeagueId = leagueId;
             Name = name;
         }
 
         public Guid Id { get; }
-        public Guid SportId { get; }
+        public Guid LeagueId { get; }
         public string Name { get; }
     }
 }

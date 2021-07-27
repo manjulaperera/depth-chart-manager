@@ -4,7 +4,7 @@ namespace DepthChartManager.Core.Dtos
 {
     public class GetSupportingPositionDto
     {
-        public Guid SportId { get; set; }
+        public Guid LeagueId { get; set; }
         public string SupportingPositionName { get; set; }
     }
 }

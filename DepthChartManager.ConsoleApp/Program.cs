@@ -1,11 +1,9 @@
-﻿using DepthChartManager.Core;
-using DepthChartManager.Core.Dtos;
+﻿using DepthChartManager.Core.Dtos;
 using DepthChartManager.Core.Interfaces.Repositories;
 using DepthChartManager.Core.Messaging;
 using DepthChartManager.Infrastructure.Repositories;
 using MediatR;
-using MediatR.SimpleInjector;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,127 +16,170 @@ namespace DepthChartManager.ConsoleApp
         public string Name { get; set; }
         public string Position { get; set; }
         public int Ranking { get; set; }
-
-        public DateTime CreatedOn { get; set; }
     }
 
     public class Program
     {
-        private Container _container = new Container();
+        private IServiceProvider _serviceProvider;
 
         private static void Main(string[] args)
         {
-            Task.Run(async () => await new Program().BuildContainer().Run()).Wait();
+            Task.Run(async () => await new Program().ConfigureServices().Run()).Wait();
         }
 
         private async Task Run()
         {
-            var mediator = _container.GetInstance<IMediator>();
+            // Add league
+            var nfl = await AddLeague("NFL");
 
-            var sport = await mediator.Send(new AddSportCommand(new CreateSportDto
+            // Add supporting positions
+            foreach (var supportingPositionName in new List<string> { "QB", "WR", "RB", "TE", "K", "P", "KR", "PR" })
             {
-                Name = "Baseball"
-            }));
-
-            var league = await mediator.Send(new AddLeagueCommand(new CreateLeagueDto
-            {
-                Name = "NFL",
-                SportId = sport.Id
-            }));
-
-            foreach (var supportingPosition in new List<string> { "QB", "WR", "RB", "TE", "K", "P", "KR", "PR" })
-            {
-                var result = await mediator.Send(new AddSupportingPositionCommand(new CreateSupportingPositionDto
-                {
-                    Name = supportingPosition,
-                    SportId = sport.Id
-                }));
+                await AddSupportingPosition(nfl.Id, supportingPositionName);
             }
 
-            var team = await mediator.Send(new AddTeamCommand(new CreateTeamDto
-            {
-                Name = "Buffalo Bills",
-                SportId = sport.Id,
-                LeagueId = league.Id,
-            }));
+            // Add team
+            var buffaloBills = await AddTeam(nfl.Id, "Buffalo Bills");
 
-            foreach (var playerName in new List<string> { "Josh Allen", "Zach Moss", "Davis Webb", "Ryan Bates" })
+            // Add players
+            foreach (var playerName in new[] { "Alice", "Bob", "Charlie" })
             {
-                var teamPlayer = await mediator.Send(new AddPlayerCommand(new CreatePlayerDto
-                {
-                    SportId = sport.Id,
-                    LeagueId = league.Id,
-                    TeamId = team.Id,
-                    Name = playerName
-                }));
+                await AddPlayer(nfl.Id, buffaloBills.Id, playerName);
             }
 
-            var qbSupportingPosition = await mediator.Send(new GetSupportingPositionCommand(new GetSupportingPositionDto
-            {
-                SportId = sport.Id,
-                SupportingPositionName = "QB"
-            }));
+            var alice = await GetPlayer(nfl.Id, buffaloBills.Id, "Alice");
+            var bob = await GetPlayer(nfl.Id, buffaloBills.Id, "Bob");
+            var charlie = await GetPlayer(nfl.Id, buffaloBills.Id, "Charlie");
 
-            var joshAllen = await mediator.Send(new GetPlayerCommand(new GetPlayerDto
-            {
-                SportId = sport.Id,
-                LeagueId = league.Id,
-                TeamId = team.Id,
-                PlayerName = "Josh Allen"
-            }));
+            var wr = await GetSupportingPosition(nfl.Id, "WR");
+            var kr = await GetSupportingPosition(nfl.Id, "KR");
 
-            var joshAllenPosition = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
-            {
-                SportId = sport.Id,
-                LeagueId = league.Id,
-                TeamId = team.Id,
-                PlayerId = joshAllen.Id,
-                SupportingPositionId = qbSupportingPosition.Id,
-                SupportingPositionRanking = 2
-            }));
+            // Update player positions
+            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, wr.Id, 0);
+            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, alice.Id, wr.Id, 0);
+            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, charlie.Id, wr.Id, 2);
+            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
 
-            joshAllenPosition = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
-            {
-                SportId = sport.Id,
-                LeagueId = league.Id,
-                TeamId = team.Id,
-                PlayerId = joshAllen.Id,
-                SupportingPositionId = qbSupportingPosition.Id,
-                SupportingPositionRanking = 1
-            }));
-
-            var wrSupportingPosition = await mediator.Send(new GetSupportingPositionCommand(new GetSupportingPositionDto
-            {
-                SportId = sport.Id,
-                SupportingPositionName = "WR"
-            }));
-
-            var davisWebb = await mediator.Send(new GetPlayerCommand(new GetPlayerDto
-            {
-                SportId = sport.Id,
-                LeagueId = league.Id,
-                TeamId = team.Id,
-                PlayerName = "Davis Webb"
-            }));
-
-            var davisWebbPOsition = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
-            {
-                SportId = sport.Id,
-                LeagueId = league.Id,
-                TeamId = team.Id,
-                PlayerId = davisWebb.Id,
-                SupportingPositionId = wrSupportingPosition.Id,
-                SupportingPositionRanking = 1
-            }));
+            var playerPositions = await GetPlayerPositions(nfl.Id, buffaloBills.Id);
         }
 
-        private Program BuildContainer()
+        private Program ConfigureServices()
         {
-            _container.BuildMediator(typeof(ISportRepository).Assembly);
+            var services = new ServiceCollection();
+            services.AddMediatR(typeof(ISportRepository).Assembly);
+            services.AddAutoMapper(typeof(ISportRepository).Assembly);
+            services.AddSingleton<ISportRepository, SportRepository>();
 
-            _container.RegisterSingleton<ISportRepository, SportRepository>();
-            _container.Verify();
+            _serviceProvider = services.BuildServiceProvider(); // Build the container now
             return this;
+        }
+
+        private async Task<LeagueDto> AddLeague(string leagueName)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new AddLeagueCommand(new CreateLeagueDto
+            {
+                Name = leagueName
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<SupportingPositionDto> AddSupportingPosition(Guid leagueId, string supportingPositionName)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new AddSupportingPositionCommand(new CreateSupportingPositionDto
+            {
+                LeagueId = leagueId,
+                Name = supportingPositionName
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<TeamDto> AddTeam(Guid leagueId, string teamName)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new AddTeamCommand(new CreateTeamDto
+            {
+                LeagueId = leagueId,
+                Name = teamName
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<PlayerDto> AddPlayer(Guid leagueId, Guid teamId, string playerName)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new AddPlayerCommand(new CreatePlayerDto
+            {
+                LeagueId = leagueId,
+                TeamId = teamId,
+                Name = playerName
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<PlayerDto> GetPlayer(Guid leagueId, Guid teamId, string playerName)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new GetPlayerCommand(new GetPlayerDto
+            {
+                LeagueId = leagueId,
+                TeamId = teamId,
+                PlayerName = playerName
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<SupportingPositionDto> GetSupportingPosition(Guid leagueId, string supportingPositionName)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new GetSupportingPositionCommand(new GetSupportingPositionDto
+            {
+                LeagueId = leagueId,
+                SupportingPositionName = supportingPositionName
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<IEnumerable<PlayerPositionDto>> GetPlayerPositions(Guid leagueId, Guid teamId)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new GetPlayerPositionsCommand(new GetPlayerPositionDto
+            {
+                LeagueId = leagueId,
+                TeamId = teamId,
+            }));
+
+            return result.Result;
+        }
+
+        private async Task<PlayerPositionDto> UpdatePlayerPosition(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
+        {
+            var mediator = _serviceProvider.GetService<IMediator>();
+
+            var result = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
+            {
+                LeagueId = leagueId,
+                TeamId = teamId,
+                PlayerId = playerId,
+                SupportingPositionId = supportingPositionId,
+                SupportingPositionRanking = supportingPositionRanking
+            }));
+
+            return result.Result;
         }
     }
 }

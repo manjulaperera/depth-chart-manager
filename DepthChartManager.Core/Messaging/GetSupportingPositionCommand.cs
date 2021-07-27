@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DepthChartManager.Core.Messaging
 {
-    public class GetSupportingPositionCommand : IRequest<SupportingPositionDto>
+    public class GetSupportingPositionCommand : IRequest<CommandResult<SupportingPositionDto>>
     {
         public GetSupportingPositionCommand(GetSupportingPositionDto supportingPositionDto)
         {
@@ -18,7 +18,7 @@ namespace DepthChartManager.Core.Messaging
         public GetSupportingPositionDto SupportingPositionDto { get; }
     }
 
-    public class GetSupportingPositionCommandHandler : IRequestHandler<GetSupportingPositionCommand, SupportingPositionDto>
+    public class GetSupportingPositionCommandHandler : IRequestHandler<GetSupportingPositionCommand, CommandResult<SupportingPositionDto>>
     {
         private readonly IMapper _mapper;
         private readonly ISportRepository _sportRepository;
@@ -29,16 +29,16 @@ namespace DepthChartManager.Core.Messaging
             _sportRepository = sportRepository;
         }
 
-        public Task<SupportingPositionDto> Handle(GetSupportingPositionCommand request, CancellationToken cancellationToken)
+        public Task<CommandResult<SupportingPositionDto>> Handle(GetSupportingPositionCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var supportingPosition = _sportRepository.GetSupportingPosition(request.SupportingPositionDto.SportId, request.SupportingPositionDto.SupportingPositionName);
-                return Task.FromResult(_mapper.Map<SupportingPositionDto>(supportingPosition));
+                var supportingPosition = _sportRepository.GetSupportingPosition(request.SupportingPositionDto.LeagueId, request.SupportingPositionDto.SupportingPositionName);
+                return Task.FromResult(new CommandResult<SupportingPositionDto>(_mapper.Map<SupportingPositionDto>(supportingPosition)));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(default(SupportingPositionDto));
+                return Task.FromResult(new CommandResult<SupportingPositionDto>(ex.Message));
             }
         }
     }

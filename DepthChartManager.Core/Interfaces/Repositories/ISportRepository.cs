@@ -6,36 +6,30 @@ namespace DepthChartManager.Core.Interfaces.Repositories
 {
     public interface ISportRepository
     {
-        Sport AddSport(string name);
+        League AddLeague(string name);
 
-        Sport GetSport(Guid id);
+        IEnumerable<League> GetLeagues();
 
-        IEnumerable<Sport> GetSports();
+        SupportingPosition AddSupportingPosition(Guid leagueId, string name);
 
-        League AddLeague(Guid sportId, string name);
+        SupportingPosition GetSupportingPosition(Guid leagueId, string supportingPositionName);
 
-        IEnumerable<League> GetLeagues(Guid sportId);
+        IEnumerable<SupportingPosition> GetSupportingPositions(Guid leagueId);
 
-        SupportingPosition AddSupportingPosition(Guid sportId, string name);
+        Team AddTeam(Guid leagueId, string teamName);
 
-        SupportingPosition GetSupportingPosition(Guid sportId, string supportingPositionName);
+        IEnumerable<Team> GetTeams(Guid leagueId);
 
-        IEnumerable<SupportingPosition> GetSupportingPositions(Guid sportId);
+        Player AddPlayer(Guid leagueId, Guid teamId, string name);
 
-        Team AddTeam(Guid sportId, Guid leagueId, string teamName);
+        IEnumerable<Player> GetPlayers(Guid leagueId, Guid teamId);
 
-        IEnumerable<Team> GetTeams(Guid sportId, Guid leagueId);
+        Player GetPlayer(Guid leagueId, Guid teamId, string playerName);
 
-        Player AddPlayer(Guid sportId, Guid leagueId, Guid teamId, string name);
+        IEnumerable<PlayerPosition> GetPlayerPositions(Guid leagueId, Guid teamId);
 
-        IEnumerable<Player> GetPlayers(Guid sportId, Guid leagueId, Guid teamId);
+        PlayerPosition UpdatePlayerPosition(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking);
 
-        Player GetPlayer(Guid sportId, Guid leagueId, Guid teamId, string playerName);
-
-        IEnumerable<PlayerPosition> GetPositionOfPlayers(Guid sportId, Guid leagueId, Guid teamId);
-
-        PlayerPosition UpdatePlayerPosition(Guid sportId, Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking);
-
-        IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid sportId, Guid leagueId, Guid teamId, Guid playerId);
+        IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId);
     }
 }

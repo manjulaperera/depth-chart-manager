@@ -106,15 +106,6 @@ namespace DepthChartManager.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid sport name.
-        /// </summary>
-        internal static string SportNameIsInvalid {
-            get {
-                return ResourceManager.GetString("SportNameIsInvalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Support position with the same name already exists for this sport.
         /// </summary>
         internal static string SupportPositionAlreadyExists {

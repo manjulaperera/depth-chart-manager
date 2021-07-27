@@ -12,6 +12,16 @@ using System.Threading.Tasks;
 
 namespace DepthChartManager.ConsoleApp
 {
+    class User
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Position { get; set; }
+        public int Ranking { get; set; }
+
+        public DateTime CreatedOn { get; set; }
+    }
+
     public class Program
     {
         private Container _container = new Container();
@@ -54,6 +64,12 @@ namespace DepthChartManager.ConsoleApp
                 LeagueId = league.Id,
             }));
 
+            var qbSupportingPosition = await mediator.Send(new GetSupportingPositionCommand(new GetSupportingPositionDto
+            {
+                SportId = sport.Id,
+                SupportingPositionName="QB"
+            }));
+
             foreach (var playerName in new List<string> { "Josh Allen", "Zach Moss", "Davis Webb", "Ryan Bates" })
             {
                 var teamPlayer = await mediator.Send(new AddPlayerCommand(new CreatePlayerDto
@@ -64,15 +80,27 @@ namespace DepthChartManager.ConsoleApp
                     Name = playerName
                 }));
 
+
                 var teamPlayerPosition = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
                 {
                     SportId = sport.Id,
                     LeagueId = league.Id,
                     TeamId = team.Id,
                     PlayerId = teamPlayer.Id,
-                    SupportingPositionId = 
+                    SupportingPositionId = qbSupportingPosition.Id,
+                    SupportingPositionRanking = 2
                 }));
 
+
+                teamPlayerPosition = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
+                {
+                    SportId = sport.Id,
+                    LeagueId = league.Id,
+                    TeamId = team.Id,
+                    PlayerId = teamPlayer.Id,
+                    SupportingPositionId = qbSupportingPosition.Id,
+                    SupportingPositionRanking = 1
+                }));
             }
         }
 

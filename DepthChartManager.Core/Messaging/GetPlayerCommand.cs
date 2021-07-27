@@ -36,7 +36,7 @@ namespace DepthChartManager.Core.Messaging
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new PlayerDto());
+                return Task.FromResult(default(PlayerDto));
             }
         }
     }

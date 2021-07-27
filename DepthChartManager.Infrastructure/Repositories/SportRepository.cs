@@ -3,6 +3,7 @@ using DepthChartManager.Domain;
 using DepthChartManager.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DepthChartManager.Infrastructure.Repositories
 {
@@ -43,6 +44,11 @@ namespace DepthChartManager.Infrastructure.Repositories
         public SupportingPosition AddSupportingPosition(Guid sportId, string name)
         {
             return GetSport(sportId)?.AddSupportingPosition(name);
+        }
+
+        public SupportingPosition GetSupportingPosition(Guid sportId, string supportingPositionName)
+        {
+            return GetSupportingPositions(sportId).FirstOrDefault(s => string.Equals(supportingPositionName, s.Name, StringComparison.OrdinalIgnoreCase));
         }
 
         public IEnumerable<SupportingPosition> GetSupportingPositions(Guid sportId)

@@ -18,6 +18,8 @@ namespace DepthChartManager.Core.Interfaces.Repositories
 
         SupportingPosition AddSupportingPosition(Guid sportId, string name);
 
+        SupportingPosition GetSupportingPosition(Guid sportId, string supportingPositionName);
+
         IEnumerable<SupportingPosition> GetSupportingPositions(Guid sportId);
 
         Team AddTeam(Guid sportId, Guid leagueId, string teamName);

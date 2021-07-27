@@ -8,7 +8,7 @@ namespace DepthChartManager.Domain
     public class Team
     {
         private List<Player> _players = new List<Player>();
-        private List<PlayerPosition> _playerPositions => new List<PlayerPosition>();
+        private List<PlayerPosition> _playerPositions = new List<PlayerPosition>();
 
         public Team(Guid sportId, Guid leagueId, string name)
         {
@@ -20,11 +20,30 @@ namespace DepthChartManager.Domain
         }
 
         public Guid Id { get; }
+        
         public Guid SportId { get; }
+        
         public Guid LeagueId { get; }
+        
         public string Name { get; }
+        
         public IEnumerable<Player> Players => _players.AsReadOnly();
-        public IEnumerable<PlayerPosition> PlayerPositions => _playerPositions.AsReadOnly();
+
+        public IEnumerable<PlayerPosition> PlayerPositions
+        {
+            get
+            {
+                var supportingPositionGroups = _playerPositions.GroupBy(r => new { r.SupportingPositionId, r.SupportingPositionRanking });
+
+                foreach (var supportingPositionGroup in supportingPositionGroups)
+                {
+                    foreach (var playerPosition in supportingPositionGroup.Reverse())
+                    {
+                        yield return playerPosition;
+                    }
+                }
+            }
+        }
 
         public Player AddPlayer(string name)
         {
@@ -49,7 +68,7 @@ namespace DepthChartManager.Domain
 
         public PlayerPosition UpdatePlayerPosition(Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
         {
-            _playerPositions.RemoveAll(pp => pp.PlayerId == playerId && pp.SupportingPositionId == supportingPositionId); // remove existing position, if any
+            _playerPositions.RemoveAll(pp => pp.PlayerId == playerId);
 
             var playerPosition = new PlayerPosition(SportId, LeagueId, Id, playerId, supportingPositionId, supportingPositionRanking);
             _playerPositions.Add(playerPosition);

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DepthChartManager.Core.Dtos
+namespace DepthChartManager.Core.Dtos.Request
 {
     public class GetPlayerPositionDto
     {

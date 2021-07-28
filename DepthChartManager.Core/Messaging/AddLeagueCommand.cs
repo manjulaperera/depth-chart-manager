@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using DepthChartManager.Core.Dtos;
+using DepthChartManager.Core.Dtos.Request;
+using DepthChartManager.Core.Dtos.Response;
 using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
 using System;

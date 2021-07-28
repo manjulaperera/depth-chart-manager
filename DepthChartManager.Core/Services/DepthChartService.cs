@@ -1,4 +1,5 @@
-﻿using DepthChartManager.Core.Dtos;
+﻿using DepthChartManager.Core.Dtos.Request;
+using DepthChartManager.Core.Dtos.Response;
 using DepthChartManager.Core.Interfaces.Services;
 using DepthChartManager.Core.Messaging;
 using MediatR;

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DepthChartManager.Core.Dtos;
+using DepthChartManager.Core.Dtos.Response;
 using DepthChartManager.Domain;
 
 namespace DepthChartManager.Core

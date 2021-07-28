@@ -1,4 +1,4 @@
-﻿namespace DepthChartManager.Core.Dtos
+﻿namespace DepthChartManager.Core.Dtos.Response
 {
     public class PlayerPositionDto
     {

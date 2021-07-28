@@ -58,14 +58,14 @@ namespace DepthChartManager.ConsoleApp
             var bob = await depthChartService.GetPlayer(nfl.Id, buffaloBills.Id, "Bob");
             var charlie = await depthChartService.GetPlayer(nfl.Id, buffaloBills.Id, "Charlie");
 
-            var wr = await depthChartService.GetSupportingPosition(nfl.Id, "WR");
-            var kr = await depthChartService.GetSupportingPosition(nfl.Id, "KR");
+            var wideReceiverPosition = await depthChartService.GetSupportingPosition(nfl.Id, "WR");
+            var kickOffReturnerPosition = await depthChartService.GetSupportingPosition(nfl.Id, "KR");
 
             // Update player positions
-            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, wr.Id, 0);
-            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, charlie.Id, wr.Id, 2);
-            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, alice.Id, wr.Id, 0);
-            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, wideReceiverPosition.Id, 0);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, charlie.Id, wideReceiverPosition.Id, 2);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, alice.Id, wideReceiverPosition.Id, 0);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kickOffReturnerPosition.Id, 0);
 
             var playerPositions = await depthChartService.GetPlayerPositions(nfl.Id, buffaloBills.Id);
 
@@ -74,7 +74,7 @@ namespace DepthChartManager.ConsoleApp
                 Console.WriteLine($"{supportingPositionInfo.Key}: [{string.Join(",", supportingPositionInfo.Select(s => $"{s.Player.Name}"))}]");
             }
 
-            var backupPlayerPositions = await depthChartService.GetBackupPlayerPositions(nfl.Id, buffaloBills.Id, alice.Id, wr.Id);
+            var backupPlayerPositions = await depthChartService.GetBackupPlayerPositions(nfl.Id, buffaloBills.Id, alice.Id, wideReceiverPosition.Id);
 
             foreach (var backPlayerPosition in backupPlayerPositions)
             {

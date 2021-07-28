@@ -28,7 +28,26 @@ namespace DepthChartManager.Domain
 
         public IEnumerable<Player> Players => _players.AsReadOnly();
 
-        public IEnumerable<PlayerPosition> PlayerPositions => _playerPositions.AsReadOnly();
+        public IEnumerable<PlayerPosition> PlayerPositions
+        {
+            get
+            {
+                var supportingPositionRows = _playerPositions.GroupBy(pp => new { pp.SupportingPosition.Id, pp.SupportingPositionRanking });
+
+                foreach (var supportingPositionRow in supportingPositionRows)
+                {
+                    var supportingPositionRankingGroups = supportingPositionRow.GroupBy(pp => pp.SupportingPositionRanking);
+
+                    foreach (var supportingPositionRankingGroup in supportingPositionRankingGroups)
+                    {
+                        foreach (var playerPosition in supportingPositionRankingGroup.Where(r => r.SupportingPositionRanking >= 0).Reverse())
+                        {
+                            yield return playerPosition;
+                        }
+                    }
+                }
+            }
+        }
 
         public Player AddPlayer(string name)
         {
@@ -47,8 +66,9 @@ namespace DepthChartManager.Domain
 
         public IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid playerId, Guid supportingPositionId)
         {
-            var playerPositionIndex = _playerPositions.FindIndex(pp => pp.Player.Id == playerId && pp.SupportingPosition.Id == supportingPositionId);
-            return _playerPositions.Where(pp => pp.SupportingPosition.Id == supportingPositionId).Skip(playerPositionIndex + 1);
+            var playerPositions = PlayerPositions.ToList();
+            var playerPositionIndex = playerPositions.FindIndex(pp => pp.Player.Id == playerId && pp.SupportingPosition.Id == supportingPositionId);
+            return playerPositions.Where(pp => pp.SupportingPosition.Id == supportingPositionId).Skip(playerPositionIndex + 1);
         }
 
         public PlayerPosition UpdatePlayerPosition(Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
@@ -61,19 +81,6 @@ namespace DepthChartManager.Domain
             var supportingPosition = League.SupportingPositions.FirstOrDefault(s => s.Id == supportingPositionId);
             var playerPosition = new PlayerPosition(League, this, player, supportingPosition, supportingPositionRanking);
             _playerPositions.Add(playerPosition);
-
-            // Reorder swimlane now
-            // For a given swmilane it would create different groups for each rank index
-            var playerPositionsByRank = _playerPositions.Where(pp => pp.SupportingPosition.Id == supportingPositionId).OrderBy(pp => pp.SupportingPositionRanking).GroupBy(pp => pp.SupportingPositionRanking).ToList();
-
-            // Clear swmimlane
-            _playerPositions.RemoveAll(pp => pp.SupportingPosition.Id == supportingPositionId);
-
-            // Update swimlane with ordered rank groups
-            foreach (var playerPositionByRank in playerPositionsByRank)
-            {
-                _playerPositions.AddRange(playerPositionByRank.Reverse()); // The last one gets priority
-            }
 
             return playerPosition;
         }

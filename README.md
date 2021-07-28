@@ -3,7 +3,9 @@
 Most team sports have a depth chart (a ranking of each player) for each position they have. 
 
 For example in NFL:
+
 Ben Roethlisberger is listed as the starting QB and first on the QB depth chart.
+
 Landry Jones, his backup is listed as the 2nd person on that depth chart.
 
 This project tries to implement the depth chart functionality.

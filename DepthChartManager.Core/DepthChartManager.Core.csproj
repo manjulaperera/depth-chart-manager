@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Interfaces\Services\**" />
-    <EmbeddedResource Remove="Interfaces\Services\**" />
-    <None Remove="Interfaces\Services\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="MediatR" Version="9.0.0" />
   </ItemGroup>

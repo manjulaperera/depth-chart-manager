@@ -1,6 +1,6 @@
-﻿using DepthChartManager.Core.Dtos;
-using DepthChartManager.Core.Interfaces.Repositories;
-using DepthChartManager.Core.Messaging;
+﻿using DepthChartManager.Core.Interfaces.Repositories;
+using DepthChartManager.Core.Interfaces.Services;
+using DepthChartManager.Core.Services;
 using DepthChartManager.Infrastructure.Repositories;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,186 +20,66 @@ namespace DepthChartManager.ConsoleApp
             Task.Run(async () => await new Program().ConfigureServices().Run()).Wait();
         }
 
-        private async Task Run()
-        {
-            // Add league
-            var nfl = await AddLeague("NFL");
-
-            // Add supporting positions
-            foreach (var supportingPositionName in new List<string> { "QB", "WR", "RB", "TE", "K", "P", "KR", "PR" })
-            {
-                await AddSupportingPosition(nfl.Id, supportingPositionName);
-            }
-
-            // Add team
-            var buffaloBills = await AddTeam(nfl.Id, "Buffalo Bills");
-
-            // Add players
-            foreach (var playerName in new[] { "Alice", "Bob", "Charlie" })
-            {
-                await AddPlayer(nfl.Id, buffaloBills.Id, playerName);
-            }
-
-            var alice = await GetPlayer(nfl.Id, buffaloBills.Id, "Alice");
-            var bob = await GetPlayer(nfl.Id, buffaloBills.Id, "Bob");
-            var charlie = await GetPlayer(nfl.Id, buffaloBills.Id, "Charlie");
-
-            var wr = await GetSupportingPosition(nfl.Id, "WR");
-            var kr = await GetSupportingPosition(nfl.Id, "KR");
-
-            // Update player positions
-            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, wr.Id, 0);
-            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, charlie.Id, wr.Id, 2);
-            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, alice.Id, wr.Id, 0);
-            await UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
-
-            var playerPositions = await GetPlayerPositions(nfl.Id, buffaloBills.Id);
-
-            foreach (var supportingPositionInfo in playerPositions.GroupBy(p => p.SupportingPosition.Name))
-            {
-                Console.WriteLine($"{supportingPositionInfo.Key}: [{string.Join(",", supportingPositionInfo.Select(s => $"{s.Player.Name}"))}]");
-            }
-
-            var backupPlayerPositions = await GetBackupPlayerPositions(nfl.Id, buffaloBills.Id, alice.Id, wr.Id);
-
-            foreach (var backPlayerPosition in backupPlayerPositions)
-            {
-                Console.WriteLine($"{backPlayerPosition.Player.Name}");
-            }
-        }
-
         private Program ConfigureServices()
         {
             var services = new ServiceCollection();
             services.AddMediatR(typeof(ISportRepository).Assembly);
             services.AddAutoMapper(typeof(ISportRepository).Assembly);
             services.AddSingleton<ISportRepository, SportRepository>();
+            services.AddSingleton<IDepthChartService, DepthChartService>();
 
             _serviceProvider = services.BuildServiceProvider(); // Build the container now
             return this;
         }
 
-        private async Task<LeagueDto> AddLeague(string leagueName)
+        private async Task Run()
         {
-            var mediator = _serviceProvider.GetService<IMediator>();
+            var depthChartService = _serviceProvider.GetService<IDepthChartService>();
 
-            var result = await mediator.Send(new AddLeagueCommand(new CreateLeagueDto
+            // Add league
+            var nfl = await depthChartService.AddLeague("NFL");
+
+            // Add supporting positions
+            foreach (var supportingPositionName in new List<string> { "QB", "WR", "RB", "TE", "K", "P", "KR", "PR" })
             {
-                Name = leagueName
-            }));
+                await depthChartService.AddSupportingPosition(nfl.Id, supportingPositionName);
+            }
 
-            return result.Result;
-        }
+            // Add team
+            var buffaloBills = await depthChartService.AddTeam(nfl.Id, "Buffalo Bills");
 
-        private async Task<SupportingPositionDto> AddSupportingPosition(Guid leagueId, string supportingPositionName)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new AddSupportingPositionCommand(new CreateSupportingPositionDto
+            // Add players
+            foreach (var playerName in new[] { "Alice", "Bob", "Charlie" })
             {
-                LeagueId = leagueId,
-                Name = supportingPositionName
-            }));
+                await depthChartService.AddPlayer(nfl.Id, buffaloBills.Id, playerName);
+            }
 
-            return result.Result;
-        }
+            var alice = await depthChartService.GetPlayer(nfl.Id, buffaloBills.Id, "Alice");
+            var bob = await depthChartService.GetPlayer(nfl.Id, buffaloBills.Id, "Bob");
+            var charlie = await depthChartService.GetPlayer(nfl.Id, buffaloBills.Id, "Charlie");
 
-        private async Task<TeamDto> AddTeam(Guid leagueId, string teamName)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
+            var wr = await depthChartService.GetSupportingPosition(nfl.Id, "WR");
+            var kr = await depthChartService.GetSupportingPosition(nfl.Id, "KR");
 
-            var result = await mediator.Send(new AddTeamCommand(new CreateTeamDto
+            // Update player positions
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, wr.Id, 0);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, charlie.Id, wr.Id, 2);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, alice.Id, wr.Id, 0);
+            await depthChartService.UpdatePlayerPosition(nfl.Id, buffaloBills.Id, bob.Id, kr.Id, 0);
+
+            var playerPositions = await depthChartService.GetPlayerPositions(nfl.Id, buffaloBills.Id);
+
+            foreach (var supportingPositionInfo in playerPositions.GroupBy(p => p.SupportingPosition.Name))
             {
-                LeagueId = leagueId,
-                Name = teamName
-            }));
+                Console.WriteLine($"{supportingPositionInfo.Key}: [{string.Join(",", supportingPositionInfo.Select(s => $"{s.Player.Name}"))}]");
+            }
 
-            return result.Result;
-        }
+            var backupPlayerPositions = await depthChartService.GetBackupPlayerPositions(nfl.Id, buffaloBills.Id, alice.Id, wr.Id);
 
-        private async Task<PlayerDto> AddPlayer(Guid leagueId, Guid teamId, string playerName)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new AddPlayerCommand(new CreatePlayerDto
+            foreach (var backPlayerPosition in backupPlayerPositions)
             {
-                LeagueId = leagueId,
-                TeamId = teamId,
-                Name = playerName
-            }));
-
-            return result.Result;
-        }
-
-        private async Task<PlayerDto> GetPlayer(Guid leagueId, Guid teamId, string playerName)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new GetPlayerCommand(new GetPlayerDto
-            {
-                LeagueId = leagueId,
-                TeamId = teamId,
-                PlayerName = playerName
-            }));
-
-            return result.Result;
-        }
-
-        private async Task<SupportingPositionDto> GetSupportingPosition(Guid leagueId, string supportingPositionName)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new GetSupportingPositionCommand(new GetSupportingPositionDto
-            {
-                LeagueId = leagueId,
-                SupportingPositionName = supportingPositionName
-            }));
-
-            return result.Result;
-        }
-
-        private async Task<IEnumerable<PlayerPositionDto>> GetPlayerPositions(Guid leagueId, Guid teamId)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new GetPlayerPositionsCommand(new GetPlayerPositionDto
-            {
-                LeagueId = leagueId,
-                TeamId = teamId,
-            }));
-
-            return result.Result;
-        }
-
-        private async Task<IEnumerable<PlayerPositionDto>> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new GetBackupPlayersCommand(new GetBackupPlayersDto
-            {
-                LeagueId = leagueId,
-                TeamId = teamId,
-                PlayerId = playerId,
-                SupportingPositionId = supportingPositionId
-            }));
-
-            return result.Result;
-        }
-
-        private async Task<PlayerPositionDto> UpdatePlayerPosition(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking)
-        {
-            var mediator = _serviceProvider.GetService<IMediator>();
-
-            var result = await mediator.Send(new UpdatePlayerPositionCommand(new UpdatePlayerPositionDto
-            {
-                LeagueId = leagueId,
-                TeamId = teamId,
-                PlayerId = playerId,
-                SupportingPositionId = supportingPositionId,
-                SupportingPositionRanking = supportingPositionRanking
-            }));
-
-            return result.Result;
+                Console.WriteLine($"{backPlayerPosition.Player.Name}");
+            }
         }
     }
 }

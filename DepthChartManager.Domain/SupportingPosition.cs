@@ -8,6 +8,7 @@ namespace DepthChartManager.Domain
         public SupportingPosition(Guid leagueId, string name)
         {
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.SupportPositionNameIsInvalid);
+
             Id = Guid.NewGuid();
             LeagueId = leagueId;
             Name = name;

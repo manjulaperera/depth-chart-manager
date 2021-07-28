@@ -10,6 +10,7 @@ namespace DepthChartManager.Domain
             Contract.Requires<Exception>(league != null, Resource.LeagueNameIsInvalid);
             Contract.Requires<Exception>(team != null, Resource.TeamNameIsInvalid);
             Contract.Requires<Exception>(!string.IsNullOrWhiteSpace(name), Resource.PlayerNameIsInvalid);
+
             Id = Guid.NewGuid();
             League = league;
             Team = team;

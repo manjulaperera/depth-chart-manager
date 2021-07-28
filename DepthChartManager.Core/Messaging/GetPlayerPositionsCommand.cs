@@ -3,7 +3,6 @@ using DepthChartManager.Core.Dtos;
 using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

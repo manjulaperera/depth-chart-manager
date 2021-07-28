@@ -81,9 +81,9 @@ namespace DepthChartManager.Infrastructure.Repositories
             return GetLeague(leagueId)?.GetTeam(teamId)?.UpdatePlayerPosition(playerId, supportingPositionId, supportingPositionRanking);
         }
 
-        public IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId)
+        public IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId)
         {
-            return GetLeague(leagueId)?.GetTeam(teamId)?.GetBackupPlayerPositions(playerId);
+            return GetLeague(leagueId)?.GetTeam(teamId)?.GetBackupPlayerPositions(playerId, supportingPositionId);
         }
     }
 }

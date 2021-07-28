@@ -30,6 +30,6 @@ namespace DepthChartManager.Core.Interfaces.Repositories
 
         PlayerPosition UpdatePlayerPosition(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId, int supportingPositionRanking);
 
-        IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId);
+        IEnumerable<PlayerPosition> GetBackupPlayerPositions(Guid leagueId, Guid teamId, Guid playerId, Guid supportingPositionId);
     }
 }

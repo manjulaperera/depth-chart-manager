@@ -3,7 +3,6 @@ using DepthChartManager.Core.Dtos;
 using DepthChartManager.Core.Interfaces.Repositories;
 using MediatR;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +34,7 @@ namespace DepthChartManager.Core.Messaging
         {
             try
             {
-                var backupPlayerPositions = _sportRepository.GetBackupPlayerPositions(request.GetBackupPlayersDto.LeagueId, request.GetBackupPlayersDto.TeamId, request.GetBackupPlayersDto.PlayerId);
+                var backupPlayerPositions = _sportRepository.GetBackupPlayerPositions(request.GetBackupPlayersDto.LeagueId, request.GetBackupPlayersDto.TeamId, request.GetBackupPlayersDto.PlayerId, request.GetBackupPlayersDto.SupportingPositionId);
                 return Task.FromResult(new CommandResult<IEnumerable<PlayerPositionDto>>(_mapper.Map<IEnumerable<PlayerPositionDto>>(backupPlayerPositions)));
             }
             catch (Exception ex)

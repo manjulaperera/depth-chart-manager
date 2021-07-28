@@ -20,9 +20,13 @@ namespace DepthChartManager.Domain
         }
 
         public League League { get; }
+
         public Team Team { get; }
+
         public Player Player { get; }
+
         public SupportingPosition SupportingPosition { get; }
+
         public int SupportingPositionRanking { get; }
     }
 }

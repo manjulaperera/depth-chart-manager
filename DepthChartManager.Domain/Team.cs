@@ -23,7 +23,9 @@ namespace DepthChartManager.Domain
         public Guid Id { get; }
 
         public League Leagued { get; }
+        
         public League League { get; }
+        
         public string Name { get; }
 
         public IEnumerable<Player> Players => _players.AsReadOnly();

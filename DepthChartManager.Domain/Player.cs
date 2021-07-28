@@ -18,8 +18,11 @@ namespace DepthChartManager.Domain
         }
 
         public Guid Id { get; }
+
         public League League { get; }
+
         public Team Team { get; }
+
         public string Name { get; }
     }
 }
